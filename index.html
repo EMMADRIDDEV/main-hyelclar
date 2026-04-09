@@ -147,6 +147,132 @@
         @view-transition {
             navigation: auto;
         }
+
+        /* Slideshow Styles */
+        .slider-container {
+            position: relative;
+            overflow: hidden;
+            border-radius: 1rem;
+        }
+
+        .slider-wrapper {
+            display: flex;
+            transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .slide {
+            min-width: 100%;
+            aspect-ratio: 16/9;
+        }
+
+        .slide img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .slider-btn {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(4px);
+            color: white;
+            padding: 1rem;
+            border-radius: 50%;
+            cursor: pointer;
+            z-index: 10;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .slider-btn:hover {
+            background: rgba(255, 255, 255, 0.4);
+            transform: translateY(-50%) scale(1.1);
+        }
+
+        .prev-btn { left: 1rem; }
+        .next-btn { right: 1rem; }
+
+        .slider-dots {
+            position: absolute;
+            bottom: 1.5rem;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 0.75rem;
+            z-index: 10;
+        }
+
+        .dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.4);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .dot.active {
+            background: #fff;
+            transform: scale(1.3);
+            box-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+        }
+
+        /* Scroll Progress Button */
+        #scroll-progress {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            width: 60px;
+            height: 60px;
+            display: none;
+            cursor: pointer;
+            z-index: 100;
+            transition: all 0.3s ease;
+        }
+
+        #progress-ring {
+            position: absolute;
+            top: 0;
+            left: 0;
+            cursor: pointer;
+        }
+
+        #progress-ring-circle {
+            transition: stroke-dashoffset 0.1s linear;
+            stroke-dasharray: 283;
+            stroke-dashoffset: 283;
+            stroke: #10b981;
+            stroke-width: 4;
+            fill: rgba(255, 255, 255, 0.9);
+            filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.1));
+        }
+
+        .arrow-up {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: #064e3b;
+        }
+
+        /* Navigation Active State */
+        .nav-link.active {
+            color: #059669;
+            position: relative;
+        }
+
+        .nav-link.active::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0.75rem;
+            right: 0.75rem;
+            height: 2px;
+            background: #059669;
+            border-radius: 1px;
+        }
     </style>
 </head>
 
@@ -159,17 +285,17 @@
                 </div>
                 <div class="hidden md:block">
                     <div class="ml-10 flex items-baseline space-x-4 lg:space-x-8"><a href="#home"
-                            class="text-gray-800 hover:text-emerald-700 px-2 lg:px-3 py-2 text-sm font-semibold transition-colors">Home</a><a
+                            class="nav-link text-gray-800 hover:text-emerald-700 px-2 lg:px-3 py-2 text-sm font-semibold transition-colors">Home</a><a
                             href="#about"
-                            class="text-gray-800 hover:text-emerald-700 px-2 lg:px-3 py-2 text-sm font-semibold transition-colors">About</a><a
+                            class="nav-link text-gray-800 hover:text-emerald-700 px-2 lg:px-3 py-2 text-sm font-semibold transition-colors">About</a><a
                             href="#expertise"
-                            class="text-gray-800 hover:text-emerald-700 px-2 lg:px-3 py-2 text-sm font-semibold transition-colors">Expertise</a><a
+                            class="nav-link text-gray-800 hover:text-emerald-700 px-2 lg:px-3 py-2 text-sm font-semibold transition-colors">Expertise</a><a
                             href="#services"
-                            class="text-gray-800 hover:text-emerald-700 px-2 lg:px-3 py-2 text-sm font-semibold transition-colors">Services</a><a
+                            class="nav-link text-gray-800 hover:text-emerald-700 px-2 lg:px-3 py-2 text-sm font-semibold transition-colors">Services</a><a
                             href="#impact"
-                            class="text-gray-800 hover:text-emerald-700 px-2 lg:px-3 py-2 text-sm font-semibold transition-colors">Impact</a><a
+                            class="nav-link text-gray-800 hover:text-emerald-700 px-2 lg:px-3 py-2 text-sm font-semibold transition-colors">Impact</a><a
                             href="#contact"
-                            class="text-gray-800 hover:text-emerald-700 px-2 lg:px-3 py-2 text-sm font-semibold transition-colors">Contact</a>
+                            class="nav-link text-gray-800 hover:text-emerald-700 px-2 lg:px-3 py-2 text-sm font-semibold transition-colors">Contact</a>
                     </div>
                 </div>
                 <div class="md:hidden"><button id="mobile-menu-btn"
@@ -398,7 +524,7 @@
                 <div class="text-center">
                     <div
                         class="bg-emerald-600 text-white rounded-full w-20 h-20 flex items-center justify-center mx-auto mb-4">
-                        <span class="text-2xl font-bold">1.5kg</span>
+                        <span class="text-2xl font-bold stat-number" data-target="1.5" data-suffix="kg">0</span>
                     </div>
                     <h3 class="text-lg font-semibold text-gray-900 mb-2">Dressed Broilers</h3>
                     <p class="text-gray-600">Delivered within 5 weeks, demonstrating operational excellence</p>
@@ -406,7 +532,7 @@
                 <div class="text-center">
                     <div
                         class="bg-emerald-600 text-white rounded-full w-20 h-20 flex items-center justify-center mx-auto mb-4">
-                        <span class="text-2xl font-bold">5K</span>
+                        <span class="text-2xl font-bold stat-number" data-target="5000" data-suffix="">0</span>
                     </div>
                     <h3 class="text-lg font-semibold text-gray-900 mb-2">Capacity Farms</h3>
                     <p class="text-gray-600">Built 5000-capacity broiler farms with advanced systems</p>
@@ -435,18 +561,28 @@
                 </div>
             </div>
             <div class="bg-white rounded-lg p-8 shadow-lg">
-                <h4 class="text-lg font-semibold text-gray-900 mb-4 text-center">Farm Gallery</h4>
-                <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
-                    <img src="images/farm1.jpg" alt="Farm Activity 1"
-                        class="w-full object-cover rounded-lg aspect-square shadow-md border hover:border-emerald-500 transition-colors">
-                    <img src="images/farm2.jpg" alt="Farm Activity 2"
-                        class="w-full object-cover rounded-lg aspect-square shadow-md border hover:border-blue-500 transition-colors">
-                    <img src="images/farm3.jpg" alt="Farm Activity 3"
-                        class="w-full object-cover rounded-lg aspect-square shadow-md border hover:border-yellow-500 transition-colors">
-                    <img src="images/farm4.jpg" alt="Farm Activity 4"
-                        class="w-full object-cover rounded-lg aspect-square shadow-md border hover:border-emerald-500 transition-colors">
-                    <img src="images/farm5.jpg" alt="Farm Activity 5"
-                        class="w-full object-cover rounded-lg aspect-square shadow-md border hover:border-blue-500 transition-colors">
+                <h4 class="text-lg font-semibold text-gray-900 mb-6 text-center">Farm Gallery</h4>
+                <div class="slider-container max-w-4xl mx-auto shadow-2xl">
+                    <div class="slider-wrapper" id="slider-wrapper">
+                        <div class="slide"><img src="images/farm1.jpg" alt="Farm Activity 1"></div>
+                        <div class="slide"><img src="images/farm2.jpg" alt="Farm Activity 2"></div>
+                        <div class="slide"><img src="images/farm3.jpg" alt="Farm Activity 3"></div>
+                        <div class="slide"><img src="images/farm4.jpg" alt="Farm Activity 4"></div>
+                        <div class="slide"><img src="images/farm5.jpg" alt="Farm Activity 5"></div>
+                        <div class="slide"><img src="images/img1.jpg" alt="Farm Activity 6"></div>
+                        <div class="slide"><img src="images/img2.jpg" alt="Farm Activity 7"></div>
+                    </div>
+                    
+                    <button class="slider-btn prev-btn" id="prevSlide">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
+                    </button>
+                    <button class="slider-btn next-btn" id="nextSlide">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                    </button>
+
+                    <div class="slider-dots" id="sliderDots">
+                        <!-- Dots will be generated by JS -->
+                    </div>
                 </div>
             </div>
         </div>
@@ -978,7 +1114,157 @@
                 element.classList.add('float-animation');
             });
         });
+
+        /* --- NEW DYNAMIC FEATURES --- */
+
+        // 1. Slideshow Logic
+        const sliderWrapper = document.getElementById('slider-wrapper');
+        const slides = document.querySelectorAll('.slide');
+        const dotsContainer = document.getElementById('sliderDots');
+        const prevBtn = document.getElementById('prevSlide');
+        const nextBtn = document.getElementById('nextSlide');
+        let currentSlide = 0;
+        let slideInterval;
+
+        // Create dots
+        slides.forEach((_, index) => {
+            const dot = document.createElement('div');
+            dot.classList.add('dot');
+            if (index === 0) dot.classList.add('active');
+            dot.addEventListener('click', () => goToSlide(index));
+            dotsContainer.appendChild(dot);
+        });
+
+        const dots = document.querySelectorAll('.dot');
+
+        function updateDots() {
+            dots.forEach((dot, index) => {
+                dot.classList.toggle('active', index === currentSlide);
+            });
+        }
+
+        function goToSlide(n) {
+            currentSlide = (n + slides.length) % slides.length;
+            sliderWrapper.style.transform = `translateX(-${currentSlide * 100}%)`;
+            updateDots();
+            resetInterval();
+        }
+
+        function nextSlide() { goToSlide(currentSlide + 1); }
+        function prevSlide() { goToSlide(currentSlide - 1); }
+
+        nextBtn.addEventListener('click', nextSlide);
+        prevBtn.addEventListener('click', prevSlide);
+
+        function startInterval() {
+            slideInterval = setInterval(nextSlide, 5000);
+        }
+
+        function resetInterval() {
+            clearInterval(slideInterval);
+            startInterval();
+        }
+
+        startInterval();
+
+        // 2. Count-up Animation Logic
+        const countUpObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const target = entry.target;
+                    const countTo = parseFloat(target.dataset.target);
+                    const suffix = target.dataset.suffix || '';
+                    const duration = 2000; // 2 seconds
+                    const frameDuration = 1000 / 60;
+                    const totalFrames = Math.round(duration / frameDuration);
+                    let frame = 0;
+
+                    const count = () => {
+                        frame++;
+                        const progress = frame / totalFrames;
+                        // Ease out quad
+                        const currentCount = countTo * (1 - (1 - progress) * (1 - progress));
+                        
+                        if (countTo % 1 === 0) {
+                            target.innerText = Math.floor(currentCount).toLocaleString() + suffix;
+                        } else {
+                            target.innerText = currentCount.toFixed(1) + suffix;
+                        }
+
+                        if (frame < totalFrames) {
+                            requestAnimationFrame(count);
+                        } else {
+                            target.innerText = countTo.toLocaleString() + suffix;
+                        }
+                    };
+                    count();
+                    countUpObserver.unobserve(target);
+                }
+            });
+        }, { threshold: 0.5 });
+
+        document.querySelectorAll('.stat-number').forEach(stat => countUpObserver.observe(stat));
+
+        // 3. Scroll Progress & Back-to-Top
+        const scrollProgress = document.getElementById('scroll-progress');
+        const progressCircle = document.getElementById('progress-ring-circle');
+        const radius = progressCircle.r.baseVal.value;
+        const circumference = radius * 2 * Math.PI;
+
+        progressCircle.style.strokeDasharray = `${circumference} ${circumference}`;
+        progressCircle.style.strokeDashoffset = circumference;
+
+        function setProgress(percent) {
+            const offset = circumference - (percent / 100) * circumference;
+            progressCircle.style.strokeDashoffset = offset;
+        }
+
+        window.addEventListener('scroll', () => {
+            const scrollPercent = (window.scrollY / (document.documentElement.scrollHeight - window.innerHeight)) * 100;
+            setProgress(scrollPercent);
+
+            if (window.scrollY > 300) {
+                scrollProgress.style.display = 'block';
+            } else {
+                scrollProgress.style.display = 'none';
+            }
+
+            // 4. Scrollspy Logic
+            const sections = document.querySelectorAll('section');
+            const navLinks = document.querySelectorAll('.nav-link');
+            
+            let current = "";
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop;
+                const sectionHeight = section.clientHeight;
+                if (window.scrollY >= (sectionTop - 150)) {
+                    current = section.getAttribute('id');
+                }
+            });
+
+            navLinks.forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('href').includes(current)) {
+                    link.classList.add('active');
+                }
+            });
+        });
+
+        scrollProgress.addEventListener('click', () => {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
     </script>
+    <!-- Scroll Progress Button -->
+    <div id="scroll-progress">
+        <svg id="progress-ring" width="60" height="60">
+            <circle id="progress-ring-circle" cx="30" cy="30" r="28" fill="transparent" />
+        </svg>
+        <div class="arrow-up">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7 7 7M12 3v18"></path>
+            </svg>
+        </div>
+    </div>
 </body>
 
 </html>
