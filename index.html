@@ -157,18 +157,22 @@
 
         .slider-wrapper {
             display: flex;
+            height: 100%;
             transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         .slide {
             min-width: 100%;
-            aspect-ratio: 16/9;
+            height: 100%;
+            position: relative;
         }
 
         .slide img {
             width: 100%;
             height: 100%;
             object-fit: cover;
+            position: absolute;
+            inset: 0;
         }
 
         .slider-btn {
@@ -378,13 +382,13 @@
                 <div class="section-fade order-1 lg:order-2" style="animation-delay: 0.3s;">
                     <div class="relative">
                         <div class="bg-white/20 backdrop-blur-sm rounded-2xl p-4 sm:p-6 lg:p-8">
-                            <div class="grid grid-cols-2 gap-3 sm:gap-4">
-                                <img src="images/top1.jpeg" alt="Dr. Hyelni Yoksa Sambo"
-                                    class="w-full h-full object-cover rounded-xl shadow-lg border-4 border-white/30 col-span-2 aspect-[4/3] sm:aspect-video hover:scale-[1.02] transition-transform duration-300">
-                                <img src="images/top2.jpeg" alt="Agriculture Activity 1"
-                                    class="w-full h-full object-cover rounded-xl shadow-lg border-4 border-white/30 aspect-square hover:scale-[1.05] transition-transform duration-300">
-                                <img src="images/top3.jpeg" alt="Agriculture Activity 2"
-                                    class="w-full h-full object-cover rounded-xl shadow-lg border-4 border-white/30 aspect-square hover:scale-[1.05] transition-transform duration-300">
+                            <div class="slider-container w-full max-w-sm mx-auto shadow-xl border-4 border-white/30 rounded-xl aspect-[4/5] sm:aspect-square">
+                                <div class="slider-wrapper">
+                                    <div class="slide"><img src="images/top1.jpeg" alt="Dr. Hyelni Yoksa Sambo"></div>
+                                    <div class="slide"><img src="images/top2.jpeg" alt="Agriculture Activity 1"></div>
+                                    <div class="slide"><img src="images/top3.jpeg" alt="Agriculture Activity 2"></div>
+                                </div>
+                                <div class="slider-dots"></div>
                             </div>
                         </div>
                     </div>
@@ -553,7 +557,7 @@
             </div>
             <div class="bg-white rounded-lg p-8 shadow-lg">
                 <h4 class="text-lg font-semibold text-gray-900 mb-6 text-center">Farm Gallery</h4>
-                <div class="slider-container max-w-4xl mx-auto shadow-2xl">
+                <div class="slider-container max-w-4xl mx-auto shadow-2xl aspect-video">
                     <div class="slider-wrapper" id="slider-wrapper">
                         <div class="slide"><img src="images/farm1.jpg" alt="Farm Activity 1"></div>
                         <div class="slide"><img src="images/farm2.jpg" alt="Farm Activity 2"></div>
@@ -1108,55 +1112,77 @@
 
         /* --- NEW DYNAMIC FEATURES --- */
 
-        // 1. Slideshow Logic
-        const sliderWrapper = document.getElementById('slider-wrapper');
-        const slides = document.querySelectorAll('.slide');
-        const dotsContainer = document.getElementById('sliderDots');
-        const prevBtn = document.getElementById('prevSlide');
-        const nextBtn = document.getElementById('nextSlide');
-        let currentSlide = 0;
-        let slideInterval;
+        // Universal Slideshow Logic
+        document.querySelectorAll('.slider-container').forEach(container => {
+            const wrapper = container.querySelector('.slider-wrapper');
+            const slides = container.querySelectorAll('.slide');
+            const dotsContainer = container.querySelector('.slider-dots');
+            const prevBtn = container.querySelector('.prev-btn');
+            const nextBtn = container.querySelector('.next-btn');
 
-        // Create dots
-        slides.forEach((_, index) => {
-            const dot = document.createElement('div');
-            dot.classList.add('dot');
-            if (index === 0) dot.classList.add('active');
-            dot.addEventListener('click', () => goToSlide(index));
-            dotsContainer.appendChild(dot);
-        });
+            if (!wrapper || slides.length === 0) return;
 
-        const dots = document.querySelectorAll('.dot');
+            let currentSlide = 0;
+            let slideInterval;
 
-        function updateDots() {
-            dots.forEach((dot, index) => {
-                dot.classList.toggle('active', index === currentSlide);
-            });
-        }
+            // Create dots dynamically
+            if (dotsContainer) {
+                dotsContainer.innerHTML = '';
+                slides.forEach((_, index) => {
+                    const dot = document.createElement('div');
+                    dot.classList.add('dot');
+                    if (index === 0) dot.classList.add('active');
+                    dot.addEventListener('click', () => goToSlide(index));
+                    dotsContainer.appendChild(dot);
+                });
+            }
 
-        function goToSlide(n) {
-            currentSlide = (n + slides.length) % slides.length;
-            sliderWrapper.style.transform = `translateX(-${currentSlide * 100}%)`;
-            updateDots();
-            resetInterval();
-        }
+            const dots = dotsContainer ? dotsContainer.querySelectorAll('.dot') : [];
 
-        function nextSlide() { goToSlide(currentSlide + 1); }
-        function prevSlide() { goToSlide(currentSlide - 1); }
+            function updateDots() {
+                dots.forEach((dot, index) => {
+                    dot.classList.toggle('active', index === currentSlide);
+                });
+            }
 
-        nextBtn.addEventListener('click', nextSlide);
-        prevBtn.addEventListener('click', prevSlide);
+            function goToSlide(n) {
+                currentSlide = (n + slides.length) % slides.length;
+                wrapper.style.transform = `translateX(-${currentSlide * 100}%)`;
+                updateDots();
+                resetInterval();
+            }
 
-        function startInterval() {
-            slideInterval = setInterval(nextSlide, 5000);
-        }
+            function nextSlide() { goToSlide(currentSlide + 1); }
+            function prevSlide() { goToSlide(currentSlide - 1); }
 
-        function resetInterval() {
-            clearInterval(slideInterval);
+            if (nextBtn) nextBtn.addEventListener('click', nextSlide);
+            if (prevBtn) prevBtn.addEventListener('click', prevSlide);
+
+            function startInterval() {
+                slideInterval = setInterval(nextSlide, 5000);
+            }
+
+            function resetInterval() {
+                clearInterval(slideInterval);
+                startInterval();
+            }
+
+            // Swipe logic for touch devices ("scrolled" effect)
+            let touchStartX = 0;
+            let touchEndX = 0;
+
+            container.addEventListener('touchstart', e => {
+                touchStartX = e.changedTouches[0].screenX;
+            }, {passive: true});
+
+            container.addEventListener('touchend', e => {
+                touchEndX = e.changedTouches[0].screenX;
+                if (touchEndX < touchStartX - 50) nextSlide();
+                if (touchEndX > touchStartX + 50) prevSlide();
+            }, {passive: true});
+
             startInterval();
-        }
-
-        startInterval();
+        });
 
         // 2. Count-up Animation Logic
         const countUpObserver = new IntersectionObserver((entries) => {
